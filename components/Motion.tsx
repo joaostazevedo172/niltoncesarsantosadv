@@ -43,23 +43,43 @@ export default function Motion() {
     const ctx = gsap.context(() => {
       if (reduce) return;
 
-      // text reveal
+      // text reveal (preserva <em> e outros destaques)
       document.querySelectorAll<HTMLElement>("[data-split]").forEach((el) => {
         if (!el.dataset.splitDone) {
-          const words = (el.textContent || "").trim().split(/\s+/);
-          el.setAttribute("aria-label", el.textContent?.trim() || "");
-          el.innerHTML = words
-            .map((w) => `<span class="split-line" aria-hidden="true"><span>${w}</span></span>`)
-            .join(" ");
+          el.setAttribute("aria-label", (el.textContent || "").replace(/\s+/g, " ").trim());
+          const wrap = (w: string, tag?: string) =>
+            `<span class="split-line" aria-hidden="true"><span>${tag ? `<${tag}>${w}</${tag}>` : w}</span></span>`;
+          const parts: string[] = [];
+          el.childNodes.forEach((n) => {
+            const words = (n.textContent || "").split(/\s+/).filter(Boolean);
+            const tag = n.nodeType === 1 ? (n as Element).tagName.toLowerCase() : undefined;
+            words.forEach((w) => parts.push(wrap(w, tag)));
+          });
+          el.innerHTML = parts.join(" ");
           el.dataset.splitDone = "1";
         }
+        const inHero = !!el.closest(".hero, .hero2");
         gsap.fromTo(
           el.querySelectorAll(".split-line > span"),
           { yPercent: 110 },
-          { yPercent: 0, duration: 1.2, ease: EASE, stagger: 0.06, delay: el.closest(".hero") ? 0.15 : 0,
-            scrollTrigger: el.closest(".hero") ? undefined : { trigger: el, start: "top 85%", once: true } },
+          { yPercent: 0, duration: 1.2, ease: EASE, stagger: 0.06, delay: inHero ? 0.25 : 0,
+            scrollTrigger: inHero ? undefined : { trigger: el, start: "top 85%", once: true } },
         );
       });
+
+      // entrada da hero com retrato
+      const hero = document.querySelector(".hero2");
+      if (hero) {
+        const tl = gsap.timeline({ defaults: { ease: EASE } });
+        tl.from("[data-hero-glow]", { opacity: 0, duration: 1.6 }, 0)
+          .from("[data-hero-photo]", { opacity: 0, y: 48, scale: 1.04, duration: 1.4, transformOrigin: "50% 100%" }, 0.1)
+          .fromTo("[data-hero-arc] circle", { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 2, ease: "power2.inOut" }, 0.2)
+          .from("[data-hero-item]", { opacity: 0, y: 24, duration: 1, stagger: 0.08 }, 0.6)
+          .from("[data-hero-badge]", { opacity: 0, x: -24, duration: 1 }, 1.0);
+        // parallax suave do retrato e do arco ao rolar
+        gsap.to("[data-hero-photo]", { yPercent: 8, ease: "none", scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true } });
+        gsap.to("[data-hero-arc]", { yPercent: -10, rotate: 12, ease: "none", scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true } });
+      }
 
       // reveal com stagger por lote
       ScrollTrigger.batch("[data-reveal]", {

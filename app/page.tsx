@@ -2,40 +2,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { areas } from "@/lib/areas";
-import { site, whatsappLink, ctaPrincipal } from "@/lib/site";
+import { site } from "@/lib/site";
 import AreaCard from "@/components/AreaCard";
 import Quote from "@/components/Quote";
 import ContactSection from "@/components/ContactSection";
-import { FaWhatsapp } from "@/components/Social";
+import HeroHome from "@/components/HeroHome";
 
 export default function Home() {
   return (
     <>
-      <section className="hero" aria-labelledby="hero-titulo">
-        <div className="hero-media" data-parallax="14">
-          <Image src="/img/foto-institucional.jpg" alt="Escritório Nilton Cesar dos Santos Advocacia" fill priority sizes="100vw" />
-        </div>
-        <div className="container hero-content">
-          <p className="label" style={{ color: "var(--night-gray)" }} data-reveal>{site.advogado} · Advocacia</p>
-          <h1 id="hero-titulo" data-split>Escritório de advocacia em Búzios e na Região dos Lagos</h1>
-          <p className="lead" data-reveal>
-            Há {site.anosDeAtuacao}, o Dr. {site.advogado} atende pessoas, empresas e municípios em 16 áreas do Direito, do cível ao criminal.
-          </p>
-          <div className="hero-actions" data-reveal>
-            <a className="btn btn-primary" href={whatsappLink()} target="_blank" rel="noopener" data-magnetic>
-              <FaWhatsapp size={18} aria-hidden /> {ctaPrincipal}
-            </a>
-            <Link className="btn btn-ghost" href="/areas-de-atuacao" style={{ color: "var(--night-ink)", borderColor: "var(--night-line)" }}>
-              Ver áreas de atuação
-            </Link>
-          </div>
-          <div className="hero-facts" data-reveal>
-            <span><strong>{site.oab}</strong></span>
-            <span><strong>Formado pela UFF</strong> · professor substituto em 2002</span>
-            <span><strong>4 municípios</strong> assessorados como procurador</span>
-          </div>
-        </div>
-      </section>
+      <HeroHome />
 
       <Quote />
 
